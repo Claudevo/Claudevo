@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claudevo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0b0f;
+  --surface: #12141a;
+  --surface2: #1a1d26;
+  --surface3: #222533;
+  --border: #2a2d3a;
+  --border2: #363a4a;
+  --text: #e8e6f0;
+  --text-soft: #a8a4b8;
+  --text-muted: #585470;
+  --accent: #7c6af7;
+  --accent2: #5de8c1;
+  --accent-soft: rgba(124,106,247,0.12);
+  --accent2-soft: rgba(93,232,193,0.1);
+  --warm: #f0b86e;
+  --warm-soft: rgba(240,184,110,0.1);
+  --danger: #f06e7a;
+  --danger-soft: rgba(240,110,122,0.1);
+  --green: #5de8a0;
+  --user-bg: #1a1d2e;
+  --user-border: #2d3155;
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.4s ease;
+}
+
+.screen.active { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#splash {
+  background: var(--bg);
+  text-align: center;
+  gap: 16px;
+}
+
+.splash-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.splash-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.splash-tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--text-soft);
+  margin-top: 8px;
+  max-width: 320px;
+}
+
+.splash-btn {
+  margin-top: 32px;
+  padding: 14px 40px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.splash-btn:hover { background: #6a58e0; transform: translateY(-1px); }
+
+.splash-credit {
+  margin-top: 48px;
+  font-size: 0.65rem;
+  color: #2a2840;
+  letter-spacing: 0.08em;
+}
+
+.splash-credit span { color: #3d3960; }
+
+#onboarding {
+  background: var(--bg);
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding: 40px 24px 80px;
+}
+
+.onboard-wrap {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.onboard-header { text-align: center; }
+
+.onboard-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.onboard-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.onboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.field-label {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 40px;
+  transition: all 0.18s;
+  user-select: none;
+}
+
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+.text-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  padding: 11px 14px;
+  outline: none;
+  border-radius: var(--radius);
+  transition: border-color 0.2s;
+}
+
+.text-input:focus { border-color: var(--accent); }
+.text-input::placeholder { color: var(--text-muted); }
+
+.onboard-continue {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.onboard-continue:hover { background: #6a58e0; }
+
+#statecheck {
+  background: var(--bg);
+  text-align: center;
+  gap: 24px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.state-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.state-sub {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  line-height: 1.65;
+  max-width: 380px;
+}
+
+.emotion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.emotion-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+}
+
+.emotion-btn:hover { border-color: var(--border2); background: var(--surface2); }
+.emotion-btn.selected { border-color: var(--accent); background: var(--accent-soft); }
+.emotion-btn.selected.caution { border-color: var(--warm); background: var(--warm-soft); }
+.emotion-btn.selected.danger { border-color: var(--danger); background: var(--danger-soft); }
+
+.emotion-icon { font-size: 1.6rem; }
+.emotion-name { font-size: 0.72rem; color: var(--text-soft); letter-spacing: 0.04em; }
+
+.state-warning {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: #f8b4ba;
+  max-width: 400px;
+  display: none;
+}
+
+.state-warning.show { display: block; }
+
+.state-continue {
+  padding: 13px 36px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.state-continue:hover { background: #6a58e0; }
+.state-continue:disabled { opacity: 0.4; cursor: not-allowed; }
+
+#app {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  z-index: 10;
+}
+
+#app.active { display: flex; }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,11,15,0.95);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.app-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.toggle input { display: none; }
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  transition: all 0.25s;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: all 0.25s;
+}
+
+.toggle input:checked ~ .toggle-track { background: var(--accent-soft); border-color: var(--accent); }
+.toggle input:checked ~ .toggle-thumb { left: 21px; background: var(--accent); }
+
+.mode-tabs { display: flex; gap: 4px; }
+
+.mode-tab {
+  padding: 5px 12px;
+  font-size: 0.72rem;
+  font-family: 'Outfit', sans-serif;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 20px;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+
+.mode-tab.active { border-color: var(--accent2); color: var(--accent2); background: var(--accent2-soft); }
+
+.profile-pill {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scroll-behavior: smooth;
+}
+
+#chat::-webkit-scrollbar { width: 3px; }
+#chat::-webkit-scrollbar-track { background: transparent; }
+#chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.context-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.ctx-chip {
+  padding: 2px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  color: var(--text-soft);
+  font-size: 0.7rem;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  animation: msgIn 0.3s ease both;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user { align-items: flex-end; }
+.message.ai { align-items: flex-start; }
+.message.system-msg { align-items: center; }
+
+.msg-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+.bubble {
+  padding: 13px 17px;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.72;
+  max-width: 88%;
+}
+
+.message.ai .bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.message.user .bubble {
+  background: var(--user-bg);
+  border: 1px solid var(--user-border);
+  color: #b0baf0;
+}
+
+.message.system-msg .bubble {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-align: center;
+  font-style: italic;
+  max-width: 100%;
+}
+
+.typing-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 17px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  width: fit-content;
+}
+
+.typing span {
+  width: 5px; height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: dot 1.3s infinite;
+  opacity: 0.4;
+}
+
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot {
+  0%,100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.reframe-card {
+  background: #111d19;
+  border: 1px solid #2a5040;
+  border-left: 3px solid var(--accent2);
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  max-width: 88%;
+  margin-top: 6px;
+}
+
+.card-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.card-label.green { color: var(--accent2); }
+
+.reframe-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #b8d8cc;
+}
+
+.card-note {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  margin-top: 10px;
+  line-height: 1.55;
+}
+
+.invite-card {
+  background: var(--warm-soft);
+  border: 1px solid rgba(240,184,110,0.2);
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  max-width: 88%;
+  margin-top: 6px;
+}
+
+.invite-card p {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.invite-btn {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--warm);
+  border: 1px solid var(--warm);
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: var(--radius);
+  font-family: 'Outfit', sans-serif;
+}
+
+.invite-btn:hover { background: var(--warm-soft); }
+
+#timing-bar {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto 4px;
+  display: none;
+}
+
+.timing-bar-inner {
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.timing-bar-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.timing-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.timing-chip {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: all 0.18s;
+  font-family: 'Outfit', sans-serif;
+}
+
+.timing-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+.timing-chip.active { border-color: var(--accent2); background: var(--accent2-soft); color: var(--accent2); }
+
+#input-area {
+  padding: 14px 16px 20px;
+  background: rgba(10,11,15,0.97);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 100%;
+}
+
+.input-inner {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  transition: border-color 0.2s;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.input-inner:focus-within { border-color: var(--accent); }
+
+textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  resize: none;
+  min-height: 22px;
+  max-height: 140px;
+}
+
+textarea::placeholder { color: var(--text-muted); }
+
+.send-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 1.1rem;
+  padding: 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  line-height: 1;
+  align-self: flex-end;
+}
+
+.send-btn:hover { opacity: 1; }
+
+.input-hint {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+#intercept {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,5,8,0.92);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+
+#intercept.show { display: flex; }
+
+.intercept-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-top: 3px solid var(--accent);
+  max-width: 540px;
+  width: 100%;
+  padding: 28px;
+  border-radius: var(--radius);
+  animation: fadeIn 0.3s ease;
+}
+
+.intercept-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.intercept-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.55;
+}
+
+.msg-block {
+  padding: 12px 14px;
+  font-size: 0.87rem;
+  line-height: 1.65;
+  margin-bottom: 10px;
+  border-radius: var(--radius);
+  font-style: italic;
+}
+
+.msg-block.original {
+  background: #1a1014;
+  border-left: 2px solid var(--danger);
+  color: #d4909a;
+}
+
+.msg-block.translated {
+  background: #101a15;
+  border-left: 2px solid var(--accent2);
+  color: #90d4b8;
+  font-family: 'Playfair Display', serif;
+}
+
+.msg-block-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+  font-style: normal;
+  font-family: 'Outfit', sans-serif;
+}
+
+.msg-block-label.red { color: var(--danger); }
+.msg-block-label.green { color: var(--accent2); }
+
+.intercept-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.55;
+  padding: 0 2px;
+}
+
+.intercept-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background: var(--accent2);
+  color: #0a1a14;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover { filter: brightness(1.1); }
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover { color: var(--text); border-color: var(--border2); }
+
+.btn-ghost {
+  padding: 10px 12px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  cursor: pointer;
+  margin-left: auto;
+  transition: color 0.2s;
+}
+
+.btn-ghost:hover { color: var(--text); }
+
+#state-gate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,5,8,0.95);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(8px);
+}
+
+#state-gate.show { display: flex; }
+
+.gate-box {
+  background: var(--surface);
+  border: 1px solid var(--danger);
+  max-width: 440px;
+  width: 100%;
+  padding: 30px;
+  border-radius: var(--radius);
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.gate-icon { font-size: 2.5rem; margin-bottom: 14px; }
+
+.gate-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--danger);
+  margin-bottom: 10px;
+}
+
+.gate-text {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.gate-actions { display: flex; gap: 10px; justify-content: center; }
+
+#profile-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,5,8,0.92);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(6px);
+}
+
+#profile-modal.show { display: flex; }
+
+.profile-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  max-width: 480px;
+  width: 100%;
+  padding: 28px;
+  border-radius: var(--radius);
+  animation: fadeIn 0.3s ease;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.profile-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .emotion-grid { grid-template-columns: repeat(2, 1fr); }
+  .mode-tabs { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="splash" class="screen active">
+  <div class="splash-logo">Claudevo</div>
+  <div class="splash-sub">Claude · Conversation · Evolution</div>
+  <div class="splash-tagline">What you mean to say — finally heard.</div>
+  <button class="splash-btn" onclick="goTo('onboarding')">Begin</button>
+  <div class="splash-credit">Conceived by <span>a diesel mechanic who'd rather be at the beach</span></div>
+</div>
+
+<div id="onboarding" class="screen">
+  <div class="onboard-wrap">
+    <div class="onboard-header">
+      <div class="onboard-title">Let's get to know you</div>
+      <div class="onboard-sub">This helps Claudevo understand your world before it tries to help you navigate it. Nothing here is judged. Everything here matters.</div>
+    </div>
+
+    <div class="onboard-section">
+      <div class="section-label">About you</div>
+      <div>
+        <div class="field-label">How do you identify?</div>
+        <div class="chip-group" id="gender-chips">
+          <div class="chip" onclick="selectChip(this,'gender')">Man</div>
+          <div class="chip" onclick="selectChip(this,'gender')">Woman</div>
+          <div class="chip" onclick="selectChip(this,'gender')">Non-binary</div>
+          <div class="chip" onclick="selectChip(this,'gender')">Prefer not to say</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Your orientation (optional)</div>
+        <div class="chip-group" id="orient-chips">
+          <div class="chip" onclick="selectChip(this,'orient')">Straight</div>
+          <div class="chip" onclick="selectChip(this,'orient')">Gay / Lesbian</div>
+          <div class="chip" onclick="selectChip(this,'orient')">Bisexual</div>
+          <div class="chip" onclick="selectChip(this,'orient')">Other</div>
+          <div class="chip" onclick="selectChip(this,'orient')">Prefer not to say</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">How do you naturally communicate?</div>
+        <div class="chip-group" id="style-chips">
+          <div class="chip" onclick="selectChip(this,'style')">Direct &amp; blunt</div>
+          <div class="chip" onclick="selectChip(this,'style')">Thoughtful &amp; careful</div>
+          <div class="chip" onclick="selectChip(this,'style')">Emotional first</div>
+          <div class="chip" onclick="selectChip(this,'style')">Analytical first</div>
+          <div class="chip" onclick="selectChip(this,'style')">Avoid conflict</div>
+          <div class="chip" onclick="selectChip(this,'style')">Tend to escalate</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Any neurodivergence you'd like Claudevo to be aware of?</div>
+        <div class="chip-group" id="neuro-chips">
+          <div class="chip" onclick="toggleChip(this,'neuro')">Autism / ASD</div>
+          <div class="chip" onclick="toggleChip(this,'neuro')">ADHD</div>
+          <div class="chip" onclick="toggleChip(this,'neuro')">Anxiety</div>
+          <div class="chip" onclick="toggleChip(this,'neuro')">Depression</div>
+          <div class="chip" onclick="toggleChip(this,'neuro')">PTSD</div>
+          <div class="chip" onclick="toggleChip(this,'neuro')">None / prefer not to say</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Your first name (optional)</div>
+        <input class="text-input" id="user-name" type="text" placeholder="What should I call you?">
+      </div>
+    </div>
+
+    <div class="onboard-section">
+      <div class="section-label">About the other person(s)</div>
+      <div>
+        <div class="field-label">What's this conversation about?</div>
+        <div class="chip-group" id="context-chips">
+          <div class="chip" onclick="selectChip(this,'context')">Romantic partner</div>
+          <div class="chip" onclick="selectChip(this,'context')">Spouse / long-term</div>
+          <div class="chip" onclick="selectChip(this,'context')">Family member</div>
+          <div class="chip" onclick="selectChip(this,'context')">Friend</div>
+          <div class="chip" onclick="selectChip(this,'context')">Coworker</div>
+          <div class="chip" onclick="selectChip(this,'context')">Boss / employee</div>
+          <div class="chip" onclick="selectChip(this,'context')">Business partner</div>
+          <div class="chip" onclick="selectChip(this,'context')">Stranger / acquaintance</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">How long have you known them?</div>
+        <div class="chip-group" id="duration-chips">
+          <div class="chip" onclick="selectChip(this,'duration')">Days / weeks</div>
+          <div class="chip" onclick="selectChip(this,'duration')">A few months</div>
+          <div class="chip" onclick="selectChip(this,'duration')">1–3 years</div>
+          <div class="chip" onclick="selectChip(this,'duration')">3–10 years</div>
+          <div class="chip" onclick="selectChip(this,'duration')">10+ years</div>
+          <div class="chip" onclick="selectChip(this,'duration')">Lifelong</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Any neurodivergence you're aware of in them?</div>
+        <div class="chip-group" id="their-neuro-chips">
+          <div class="chip" onclick="toggleChip(this,'their-neuro')">Autism / ASD</div>
+          <div class="chip" onclick="toggleChip(this,'their-neuro')">ADHD</div>
+          <div class="chip" onclick="toggleChip(this,'their-neuro')">Anxiety</div>
+          <div class="chip" onclick="toggleChip(this,'their-neuro')">Depression</div>
+          <div class="chip" onclick="toggleChip(this,'their-neuro')">PTSD</div>
+          <div class="chip" onclick="toggleChip(this,'their-neuro')">Unknown</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboard-section">
+      <div class="section-label">The environment</div>
+      <div>
+        <div class="field-label">Where is this happening?</div>
+        <div class="chip-group" id="env-chips">
+          <div class="chip" onclick="selectChip(this,'env')">Text / digital</div>
+          <div class="chip" onclick="selectChip(this,'env')">In person</div>
+          <div class="chip" onclick="selectChip(this,'env')">Phone call</div>
+          <div class="chip" onclick="selectChip(this,'env')">Work / professional</div>
+          <div class="chip" onclick="selectChip(this,'env')">Public setting</div>
+          <div class="chip" onclick="selectChip(this,'env')">Home</div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Is this one-on-one or a group?</div>
+        <div class="chip-group" id="group-chips">
+          <div class="chip" onclick="selectChip(this,'group')">Just the two of us</div>
+          <div class="chip" onclick="selectChip(this,'group')">Small group (3–5)</div>
+          <div class="chip" onclick="selectChip(this,'group')">Larger group</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="onboard-continue" onclick="finishOnboarding()">Continue →</button>
+  </div>
+</div>
+
+<div id="statecheck" class="screen">
+  <div class="state-title">Before we begin —</div>
+  <div class="state-sub">How are you feeling right now? Claudevo uses this to protect you from saying something you might regret.</div>
+  <div class="emotion-grid">
+    <div class="emotion-btn" onclick="selectEmotion(this,'calm')"><div class="emotion-icon">😌</div><div class="emotion-name">Calm</div></div>
+    <div class="emotion-btn" onclick="selectEmotion(this,'okay')"><div class="emotion-icon">🙂</div><div class="emotion-name">Okay</div></div>
+    <div class="emotion-btn" onclick="selectEmotion(this,'anxious')"><div class="emotion-icon">😰</div><div class="emotion-name">Anxious</div></div>
+    <div class="emotion-btn caution" onclick="selectEmotion(this,'upset')"><div class="emotion-icon">😤</div><div class="emotion-name">Upset</div></div>
+    <div class="emotion-btn caution" onclick="selectEmotion(this,'angry')"><div class="emotion-icon">😠</div><div class="emotion-name">Angry</div></div>
+    <div class="emotion-btn danger" onclick="selectEmotion(this,'furious')"><div class="emotion-icon">🤬</div><div class="emotion-name">Furious</div></div>
+    <div class="emotion-btn" onclick="selectEmotion(this,'sad')"><div class="emotion-icon">😢</div><div class="emotion-name">Sad</div></div>
+    <div class="emotion-btn" onclick="selectEmotion(this,'hurt')"><div class="emotion-icon">💔</div><div class="emotion-name">Hurt</div></div>
+    <div class="emotion-btn caution" onclick="selectEmotion(this,'euphoric')"><div class="emotion-icon">🥳</div><div class="emotion-name">Euphoric</div></div>
+  </div>
+  <div class="state-warning" id="state-warning"></div>
+  <button class="state-continue" id="state-continue-btn" onclick="enterApp()" disabled>Enter Claudevo</button>
+</div>
+
+<div id="app">
+  <div class="app-header">
+    <div class="app-logo">Claudevo</div>
+    <div class="header-controls">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setMode('solo',this)">Solo</button>
+        <button class="mode-tab" onclick="setMode('group',this)">Group</button>
+      </div>
+      <div class="toggle-wrap">
+        <span class="toggle-label">AI</span>
+        <label class="toggle">
+          <input type="checkbox" id="ai-toggle" checked onchange="toggleAI(this)">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="profile-pill" onclick="showProfile()" id="profile-initial">?</div>
+    </div>
+  </div>
+
+  <div id="chat"></div>
+
+  <div id="timing-bar">
+    <div class="timing-bar-inner">
+      <div class="timing-bar-label">How long did they take to respond?</div>
+      <div class="timing-chips">
+        <div class="timing-chip" onclick="setTiming(this,'Instantly — under a minute')">Instantly</div>
+        <div class="timing-chip" onclick="setTiming(this,'A few minutes')">Few min</div>
+        <div class="timing-chip" onclick="setTiming(this,'About 30 minutes')">~30 min</div>
+        <div class="timing-chip" onclick="setTiming(this,'A few hours')">Few hours</div>
+        <div class="timing-chip" onclick="setTiming(this,'Most of the day')">All day</div>
+        <div class="timing-chip" onclick="setTiming(this,'Days later')">Days</div>
+        <div class="timing-chip" onclick="setTiming(this,'They haven\'t responded yet')">No reply</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="input-area">
+    <div class="input-inner">
+      <textarea id="userInput" rows="1"
+        placeholder="Say what's on your mind — don't filter it..."
+        oninput="autoResize(this)"
+        onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" onclick="sendMessage()" title="Send">&#9654;</button>
+    </div>
+    <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; Toggle AI off to speak freely</div>
+  </div>
+</div>
+
+<div id="intercept">
+  <div class="intercept-box">
+    <div class="intercept-title">Hold on a moment.</div>
+    <div class="intercept-sub">What you wrote is real. But here's a version that might actually land without putting them on the defensive.</div>
+    <div class="msg-block original">
+      <div class="msg-block-label red">What you wrote</div>
+      <div id="intercept-original"></div>
+    </div>
+    <div class="msg-block translated">
+      <div class="msg-block-label green">What they might actually hear</div>
+      <div id="intercept-translated">Translating...</div>
+    </div>
+    <div class="intercept-note" id="intercept-note"></div>
+    <div class="intercept-actions">
+      <button class="btn-primary" onclick="sendTranslated()">Send the gentler version</button>
+      <button class="btn-secondary" onclick="sendOriginal()">Send what I wrote</button>
+      <button class="btn-ghost" onclick="closeIntercept()">Go back &amp; edit</button>
+    </div>
+  </div>
+</div>
+
+<div id="state-gate">
+  <div class="gate-box">
+    <div class="gate-icon" id="gate-icon">⚠️</div>
+    <div class="gate-title" id="gate-title">You might want to wait.</div>
+    <div class="gate-text" id="gate-text">You're in an extreme emotional state right now. Sending this message might not go the way you want it to.</div>
+    <div class="gate-actions">
+      <button class="btn-secondary" onclick="closeGate()">Send anyway</button>
+      <button class="btn-primary" onclick="dismissAndWait()">I'll wait</button>
+    </div>
+  </div>
+</div>
+
+<div id="profile-modal">
+  <div class="profile-box">
+    <div class="profile-title">Your profile</div>
+    <div id="profile-display"></div>
+    <div style="margin-top:20px; display:flex; gap:10px;">
+      <button class="btn-primary" onclick="closeProfile()">Done</button>
+      <button class="btn-secondary" onclick="rerunStateCheck()">Check my state</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://claudevo.vercel.app/api/chat';
+
+const profile = {
+  name: '', gender: '', orientation: '', commStyle: '',
+  neuro: [], context: '', duration: '', theirNeuro: [],
+  env: '', group: '', currentState: ''
+};
+
+let conversationHistory = [];
+let messageCount = 0;
+let phase = 'gathering';
+let aiEnabled = true;
+let currentMode = 'solo';
+let currentTiming = null;
+let pendingText = '';
+let pendingTranslated = '';
+let gateCallback = null;
+const extremeStates = ['furious', 'euphoric'];
+const cautionStates = ['angry', 'upset'];
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+}
+
+function goToApp() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('app').classList.add('active');
+  document.getElementById('app').style.display = 'flex';
+}
+
+const selections = {};
+
+function selectChip(el, group) {
+  document.querySelectorAll(`#${group}-chips .chip`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[group] = el.textContent.trim();
+}
+
+function toggleChip(el, group) {
+  el.classList.toggle('selected');
+  if (!selections[group]) selections[group] = [];
+  const val = el.textContent.trim();
+  if (el.classList.contains('selected')) {
+    if (!selections[group].includes(val)) selections[group].push(val);
+  } else {
+    selections[group] = selections[group].filter(v => v !== val);
+  }
+}
+
+function finishOnboarding() {
+  profile.name = document.getElementById('user-name').value.trim() || 'Friend';
+  profile.gender = selections['gender'] || 'not specified';
+  profile.orientation = selections['orient'] || 'not specified';
+  profile.commStyle = selections['style'] || 'not specified';
+  profile.neuro = selections['neuro'] || [];
+  profile.context = selections['context'] || 'not specified';
+  profile.duration = selections['duration'] || 'not specified';
+  profile.theirNeuro = selections['their-neuro'] || [];
+  profile.env = selections['env'] || 'not specified';
+  profile.group = selections['group'] || 'not specified';
+  document.getElementById('profile-initial').textContent = profile.name.charAt(0).toUpperCase();
+  goTo('statecheck');
+}
+
+function selectEmotion(el, state) {
+  document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  profile.currentState = state;
+  const warning = document.getElementById('state-warning');
+  const btn = document.getElementById('state-continue-btn');
+  btn.disabled = false;
+  if (extremeStates.includes(state)) {
+    warning.classList.add('show');
+    warning.textContent = state === 'furious'
+      ? "You're in a highly activated state. Claudevo will still help — but will flag if what you're about to send could make things significantly worse."
+      : "When we feel amazing, we sometimes say yes too quickly. Claudevo will gently flag when your state might be influencing your response.";
+  } else if (cautionStates.includes(state)) {
+    warning.classList.add('show');
+    warning.textContent = "You're feeling some heat. That's okay. Claudevo will pay close attention and offer a translation if something might land wrong.";
+  } else {
+    warning.classList.remove('show');
+  }
+}
+
+function enterApp() { goToApp(); initChat(); }
+
+function setMode(mode, el) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (mode === 'group') addSystemMessage("Group mode — Claudevo will observe and chime in when someone isn't being heard or things are escalating.");
+}
+
+function toggleAI(checkbox) {
+  aiEnabled = checkbox.checked;
+  addSystemMessage(aiEnabled ? "Claudevo is back. I'm listening." : "Claudevo is off. Speak freely.");
+}
+
+function showProfile() {
+  document.getElementById('profile-display').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:0.83rem;color:var(--text-soft);line-height:1.7;">
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Name</span><br>${profile.name}</div>
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Situation</span><br>${profile.context} · ${profile.duration}</div>
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Communication style</span><br>${profile.commStyle}</div>
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Your neurodivergence</span><br>${profile.neuro.length ? profile.neuro.join(', ') : 'None specified'}</div>
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Their neurodivergence</span><br>${profile.theirNeuro.length ? profile.theirNeuro.join(', ') : 'None specified'}</div>
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Current state</span><br>${profile.currentState || 'Not assessed'}</div>
+      <div><span style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Environment</span><br>${profile.env} · ${profile.group}</div>
+    </div>`;
+  document.getElementById('profile-modal').classList.add('show');
+}
+
+function closeProfile() { document.getElementById('profile-modal').classList.remove('show'); }
+function rerunStateCheck() { closeProfile(); goTo('statecheck'); }
+
+function scrollBottom() {
+  const chat = document.getElementById('chat');
+  setTimeout(() => chat.scrollTop = chat.scrollHeight, 80);
+}
+
+function addMessage(role, text, extra) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = `message ${role}`;
+  if (role !== 'system-msg') {
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = role === 'ai' ? 'Claudevo' : (profile.name || 'You');
+    wrap.appendChild(label);
+  }
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = text.replace(/\n/g, '<br>');
+  wrap.appendChild(bubble);
+  if (extra) wrap.appendChild(extra);
+  chat.appendChild(wrap);
+  scrollBottom();
+}
+
+function addSystemMessage(text) { addMessage('system-msg', text); }
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'typing-wrap';
+  wrap.id = 'typing-indicator';
+  const lbl = document.createElement('div');
+  lbl.className = 'msg-label';
+  lbl.textContent = 'Claudevo';
+  const t = document.createElement('div');
+  t.className = 'typing';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  wrap.appendChild(lbl);
+  wrap.appendChild(t);
+  chat.appendChild(wrap);
+  scrollBottom();
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function buildReframeCard(text, note) {
+  const card = document.createElement('div');
+  card.className = 'reframe-card';
+  const lbl = document.createElement('div');
+  lbl.className = 'card-label green';
+  lbl.textContent = '✦ Suggested reframe';
+  const body = document.createElement('div');
+  body.className = 'reframe-text';
+  body.textContent = text;
+  card.appendChild(lbl);
+  card.appendChild(body);
+  if (note) {
+    const n = document.createElement('div');
+    n.className = 'card-note';
+    n.textContent = note;
+    card.appendChild(n);
+  }
+  return card;
+}
+
+function buildInviteCard() {
+  const card = document.createElement('div');
+  card.className = 'invite-card';
+  const p = document.createElement('p');
+  p.textContent = "If you think they'd be open to it — you could invite them here. Not as a trap. Just as a space where they can also be heard. Completely their choice.";
+  const btn = document.createElement('div');
+  btn.className = 'invite-btn';
+  btn.textContent = 'Generate invite link';
+  btn.onclick = () => { btn.textContent = `claudevo.app/join/mg-${Math.random().toString(36).substr(2,6)} — copied ✓`; };
+  card.appendChild(p);
+  card.appendChild(btn);
+  return card;
+}
+
+function setTiming(el, label) {
+  currentTiming = label;
+  document.querySelectorAll('.timing-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showTimingBar() { document.getElementById('timing-bar').style.display = 'block'; }
+
+function buildSystemPrompt() {
+  const nd = profile.neuro.length ? profile.neuro.join(', ') : 'none specified';
+  const tnd = profile.theirNeuro.length ? profile.theirNeuro.join(', ') : 'none specified';
+  return `You are Claudevo — a warm, perceptive, non-judgmental communication mediator.
+
+USER PROFILE:
+- Name: ${profile.name}
+- Gender: ${profile.gender}, Orientation: ${profile.orientation}
+- Communication style: ${profile.commStyle}
+- Neurodivergence: ${nd}
+- Current emotional state: ${profile.currentState}
+- Situation: ${profile.context}, known each other: ${profile.duration}
+- Their neurodivergence: ${tnd}
+- Environment: ${profile.env}, ${profile.group}
+- Mode: ${currentMode}
+
+YOUR ROLE:
+1. Gather the full picture gently — relationship dynamics, history, and MICRO-SIGNALS: tone shifts, facial expressions, body language, silences, response times.
+2. Factor in RESPONSE TIME when shared. A clipped reply after hours means something different than an instant one.
+3. Be neurodivergence-aware. Adapt framing for ASD, ADHD etc.
+4. Take raw messages — profanity, anger, inarticulate pain — and translate them into something receivable.
+5. Watch for state-driven mistakes. Flag when emotion is driving the response more than the situation.
+6. In group mode, observe dynamics and chime in when someone isn't being heard.
+7. At the right moment, gently offer the option to invite the other person.
+
+STYLE: Warm, calm, one question at a time, short responses, never take sides, accept profanity naturally.
+
+When ready to reframe: REFRAME_START[message]REFRAME_END and REFRAME_NOTE_START[one sentence why]REFRAME_NOTE_END
+When ready to invite: end with SHOW_INVITE`;
+}
+
+const INTERCEPT_SYSTEM = `You are a real-time communication translator. Analyze the message and return ONLY valid JSON:
+{"shouldIntercept":true/false,"translated":"gentler version preserving emotional truth","note":"one sentence why the reframe works better","stateFlag":true/false,"stateFlagReason":"if state is driving this"}
+shouldIntercept=true if: aggression, accusation, profanity, passive aggression, sarcasm, or escalating language.
+Return ONLY JSON. Nothing else.`;
+
+async function callAPI(system, messages, maxTokens) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens || 1000,
+      system,
+      messages
+    })
+  });
+  return await res.json();
+}
+
+async function checkIntercept(text) {
+  try {
+    const data = await callAPI(INTERCEPT_SYSTEM, [{ role: 'user', content: `User state: ${profile.currentState}\nMessage: ${text}` }], 400);
+    const raw = data.content?.[0]?.text || '{}';
+    return JSON.parse(raw.replace(/```json|```/g, '').trim());
+  } catch(e) { return { shouldIntercept: false }; }
+}
+
+function showIntercept(original, translated, note) {
+  document.getElementById('intercept-original').textContent = original;
+  document.getElementById('intercept-translated').textContent = translated;
+  document.getElementById('intercept-note').textContent = note || '';
+  document.getElementById('intercept').classList.add('show');
+}
+
+function closeIntercept() { document.getElementById('intercept').classList.remove('show'); }
+
+function sendTranslated() { closeIntercept(); dispatchMessage(pendingTranslated, pendingText); }
+
+function sendOriginal() {
+  closeIntercept();
+  if (extremeStates.includes(profile.currentState)) { showStateGate(() => dispatchMessage(pendingText)); return; }
+  dispatchMessage(pendingText);
+}
+
+function showStateGate(callback) {
+  gateCallback = callback;
+  const isFurious = profile.currentState === 'furious';
+  document.getElementById('gate-icon').textContent = isFurious ? '🌡️' : '⚠️';
+  document.getElementById('gate-title').textContent = isFurious ? "You might want to breathe first." : "You're feeling a lot right now.";
+  document.getElementById('gate-text').textContent = isFurious
+    ? "You said you're furious. Sending this right now could close a door that's hard to reopen. Even 20 minutes can change everything. But it's your call."
+    : "When we're feeling amazing, we sometimes say yes too quickly. Are you sure this is the right moment?";
+  document.getElementById('state-gate').classList.add('show');
+}
+
+function closeGate() {
+  document.getElementById('state-gate').classList.remove('show');
+  if (gateCallback) { gateCallback(); gateCallback = null; }
+}
+
+function dismissAndWait() {
+  document.getElementById('state-gate').classList.remove('show');
+  gateCallback = null;
+  addSystemMessage("Message held. Come back when you're ready. The conversation will still be here.");
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  if (messageCount > 0) showTimingBar();
+  if (!aiEnabled) { addMessage('user', text); messageCount++; return; }
+  if (messageCount >= 2 && text.length > 12) {
+    const intercept = await checkIntercept(text);
+    if (intercept.shouldIntercept && intercept.translated) {
+      pendingText = text; pendingTranslated = intercept.translated;
+      showIntercept(text, intercept.translated, intercept.note); return;
+    }
+    if (intercept.stateFlag && extremeStates.includes(profile.currentState)) {
+      pendingText = text; showStateGate(() => dispatchMessage(text)); return;
+    }
+  }
+  dispatchMessage(text);
+}
+
+async function dispatchMessage(text, originalText) {
+  let fullContent = text;
+  if (currentTiming) {
+    fullContent = `[Response time: ${currentTiming}]\n\n${text}`;
+    currentTiming = null;
+    document.querySelectorAll('.timing-chip').forEach(c => c.classList.remove('active'));
+  }
+  if (originalText) fullContent += `\n\n[Note: ${profile.name} originally wrote "${originalText}" but chose the gentler version]`;
+
+  addMessage('user', text);
+  messageCount++;
+  conversationHistory.push({ role: 'user', content: fullContent });
+  showTyping();
+
+  let extra = '';
+  if (messageCount >= 5 && phase === 'gathering') {
+    extra = ' You now have enough to work with. Give your response AND include a reframe using REFRAME_START[...]REFRAME_END and REFRAME_NOTE_START[...]REFRAME_NOTE_END';
+    phase = 'reframing';
+  } else if (messageCount >= 9 && phase === 'reframing') {
+    extra = ' Gently offer the invite now. End your message with SHOW_INVITE';
+    phase = 'inviting';
+  }
+
+  try {
+    const data = await callAPI(buildSystemPrompt() + extra, conversationHistory, 1000);
+    removeTyping();
+    let raw = data.content?.[0]?.text || "I'm here. Take your time.";
+    let reframeCard = null;
+    let showInvite = false;
+
+    if (raw.includes('REFRAME_START')) {
+      const rm = raw.match(/REFRAME_START\[([\s\S]*?)\]REFRAME_END/);
+      const nm = raw.match(/REFRAME_NOTE_START\[([\s\S]*?)\]REFRAME_NOTE_END/);
+      const rt = rm ? rm[1].trim() : '';
+      const nt = nm ? nm[1].trim() : '';
+      raw = raw.replace(/REFRAME_START\[[\s\S]*?\]REFRAME_END/, '').replace(/REFRAME_NOTE_START\[[\s\S]*?\]REFRAME_NOTE_END/, '').trim();
+      if (rt) reframeCard = buildReframeCard(rt, nt);
+    }
+
+    if (raw.includes('SHOW_INVITE')) { raw = raw.replace('SHOW_INVITE', '').trim(); showInvite = true; }
+
+    conversationHistory.push({ role: 'assistant', content: raw });
+    addMessage('ai', raw, reframeCard);
+
+    if (showInvite) {
+      const chat = document.getElementById('chat');
+      const wrap = document.createElement('div');
+      wrap.className = 'message ai';
+      const lbl = document.createElement('div');
+      lbl.className = 'msg-label';
+      lbl.textContent = 'Claudevo';
+      wrap.appendChild(lbl);
+      wrap.appendChild(buildInviteCard());
+      chat.appendChild(wrap);
+      scrollBottom();
+    }
+  } catch(err) {
+    removeTyping();
+    addMessage('ai', "Something went quiet on my end. Try again whenever you're ready.");
+  }
+}
+
+async function initChat() {
+  const chat = document.getElementById('chat');
+  const bar = document.createElement('div');
+  bar.className = 'context-bar';
+  bar.innerHTML = `
+    <span style="color:var(--text-muted);font-size:0.68rem;">Context:</span>
+    <span class="ctx-chip">${profile.context}</span>
+    <span class="ctx-chip">${profile.duration}</span>
+    <span class="ctx-chip">${profile.env}</span>
+    ${profile.neuro.length ? `<span class="ctx-chip" style="border-color:#7a4a9e;color:#b47ad8;">You: ${profile.neuro.join(', ')}</span>` : ''}
+    ${profile.theirNeuro.length && !profile.theirNeuro.includes('Unknown') ? `<span class="ctx-chip" style="border-color:#4a7a9e;color:#7ab4d8;">Them: ${profile.theirNeuro.join(', ')}</span>` : ''}
+  `;
+  chat.appendChild(bar);
+  showTyping();
+  try {
+    const data = await callAPI(buildSystemPrompt(), [{ role: 'user', content: `__init__ - greet ${profile.name} warmly, acknowledge their current state (${profile.currentState}) briefly if relevant, and invite them to tell you what's going on. Keep it short and human.` }], 350);
+    removeTyping();
+    const greeting = data.content?.[0]?.text || `Hey ${profile.name}. Whatever's going on — just say it. I'm here.`;
+    conversationHistory.push({ role: 'user', content: '__init__' });
+    conversationHistory.push({ role: 'assistant', content: greeting });
+    addMessage('ai', greeting);
+  } catch(e) {
+    removeTyping();
+    addMessage('ai', `Hey ${profile.name}. Whatever's going on — just say it however it comes out. I'm not here to judge.`);
+  }
+}
+</script>
+</body>
+</html>
